@@ -8,9 +8,6 @@ df = pd.read_csv('2021-2022 Football Player Stats.csv')
 # remove dublicates
 df.drop_duplicates(subset=["Player"], keep="first", inplace=True)
 
-# has got � in name
-df['unreadable_name'] = df['Player'].apply(lambda x: 1 if '�' in x.lower() else 0)
-
 # got subbed in
 df['subbed_in'] = df['MP'] - df['Starts']
 
@@ -36,6 +33,12 @@ total_yellow_cards = np.round(df['CrdY'] * df['90s'])
 total_red_cards = np.round(df['CrdR'] * df['90s'])
 df['total_cards'] = total_yellow_cards + total_red_cards
 
+# G/A
+df['G/A'] = df["Goals"] + df["Assists"]
+
+# remove Javier Llabres reson missing data
+df = df[df["Rk"] != 1532]
+
 # multiply columns by 90s to get total things and not per 90 minutes
 
 total_div_to_convert = df[['Shots', 'SoT', 'ShoFK', 'ShoPK', 'PKatt', 'PasTotCmp', 'PasTotAtt', 'PasShoCmp',
@@ -54,9 +57,4 @@ total_div_to_convert = df[['Shots', 'SoT', 'ShoFK', 'ShoPK', 'PKatt', 'PasTotCmp
 for column in total_div_to_convert.columns:
     df[column] = np.round(df[column] * df['90s'])
 
-# Card per Foul
-
-df['Card/Foul'] = df['total_cards'] / df['Fls']
-
 df.to_csv("Cleaned Data.csv")
-
